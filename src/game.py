@@ -1,6 +1,6 @@
 from src.channel import Channel
-from src.notifications import Info, DamageReceived
-from src.player import Player
+from src.notifications import Info, DamageReceived, Error
+from src.player import Player, NoSuchCardException
 from src.state import State
 
 
@@ -16,10 +16,10 @@ class Game:
         while True:
             if step is None:
                 break
-            if step.get("just_send", False):
+            elif step.get("just_send", False):
                 self.channel.send(step["content"])
                 step = running_game.send(None)
-            if step.get("send_and_receive", False):
+            elif step.get("send_and_receive", False):
                 self.channel.send(step["content"])
                 received = await self.channel.receive()
                 step = running_game.send(received)
@@ -44,19 +44,32 @@ class Game:
             while True:
                 command = yield self.send_and_receive(Info(self.state.current_player, Info.PLAY_CARD))
                 cmd_runner = command.execute(self.state)
-                step = cmd_runner.send(None)
+                try:
+                    step = cmd_runner.send(None)
+                except NoSuchCardException:
+                    yield self.just_send(Error(self.state.current_player, Error.CANT_PLAY_CARD_NOT_IN_HAND))
+                    continue
                 if step is None:
                     break
+                if isinstance(step, Error):
+                    yield self.just_send(step)
+                    continue
                 while step is not None:
                     action = yield self.send_and_receive(step)
                     step = cmd_runner.send(action)
                     if step is None:
                         break
+                    if isinstance(step, Error):
+                        yield self.just_send(step)
+                        continue
                     if isinstance(step, DamageReceived):
                         yield self.just_send(step)
                         break
 
             # phase 3
-            drop_cards_command = yield self.send_and_receive(Info(self.state.current_player, Info.REMOVE_CARDS))
-            drop_cards_command.execute(self.state).send(None)
+            if len(self.state.current_player.cards) > self.state.current_player.health:
+                drop_cards_command = yield self.send_and_receive(Info(self.state.current_player, Info.REMOVE_CARDS))
+                step = drop_cards_command.execute(self.state).send(None)
+                if step is not None:
+                    yield self.just_send(step)
             self.state.end_turn()

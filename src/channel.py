@@ -68,9 +68,15 @@ class TerminalChannel(Channel):
     ]
 
     info_mappings = {
-        Info.PLAY_CARD: "play card!",
-        Info.BANG_OR_DODGE: "you can play dodge or beer",
-        Info.REMOVE_CARDS: "remove cards e.g. 1,2 to remove first and second cards"
+        Info.PLAY_CARD: "Play card!",
+        Info.BANG_OR_DODGE: "You can play dodge or beer",
+        Info.REMOVE_CARDS: "Remove cards e.g. 1,2 to remove first and second cards"
+    }
+
+    error_mappings = {
+        Error.BANG_HIMSELF: "You can't play bang on yourself!",
+        Error.TOO_LITTLE_CARDS_DROPPED: "Drop more cards. You can have at most number of cards equal to your health",
+        Error.CANT_PLAY_CARD_NOT_IN_HAND: "You can only play cards you have on your hand!"
     }
 
     def send(self, notification):
@@ -79,7 +85,7 @@ class TerminalChannel(Channel):
         elif isinstance(notification, DamageReceived):
             print("[{}]: you received {} damage!".format(notification.player, notification.value))
         elif isinstance(notification, Error):
-            print("[{}]: don't cheat. {}!".format(notification.player, notification.error))
+            print("[ERROR][{}]: {}!".format(notification.player, self.error_mappings[notification.error]))
 
     async def receive(self):
         """

@@ -18,6 +18,10 @@ class DamageReceived:
 
 class Error:
 
+    BANG_HIMSELF = 0
+    TOO_LITTLE_CARDS_DROPPED = 1
+    CANT_PLAY_CARD_NOT_IN_HAND = 2
+
     def __init__(self, player, error) -> None:
         self.player = player
         self.error = error

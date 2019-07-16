@@ -1,6 +1,13 @@
 from typing import List
 
 
+class NoSuchCardException(Exception):
+
+    def __init__(self, card_id, *args: object) -> None:
+        super().__init__(*args)
+        self.card_id = card_id
+
+
 class Player:
 
     def __init__(self, name) -> None:
@@ -12,8 +19,11 @@ class Player:
     def add_cards(self, ids):
         self.cards = self.cards + ids
 
-    def remove_card(self, id):
-        self.cards.remove(id)
+    def remove_card(self, card_id):
+        try:
+            self.cards.remove(card_id)
+        except ValueError:
+            raise NoSuchCardException(card_id)
 
     def drop_cards(self, ids):
         self.cards = [card for j, card in enumerate(self.cards) if j not in ids]

@@ -1,4 +1,4 @@
-from src.notifications import DamageReceived, Info
+from src.notifications import DamageReceived, Info, Error
 
 
 class Command:
@@ -13,6 +13,9 @@ class BangCommand(Command):
         self.target = target
 
     def execute(self, state):
+        if state.current_player.name == self.target:
+            yield Error(state.current_player, Error.BANG_HIMSELF)
+            return
         target = next(p for p in state.players if p.name == self.target)
         state.current_player.remove_card("bang")
         answer = yield Info(target, Info.BANG_OR_DODGE)
@@ -54,5 +57,8 @@ class DropCards(Command):
         self.ids = ids
 
     def execute(self, state):
+        if len(state.current_player.cards) - len(self.ids) > state.current_player.health:
+            yield Error(state.current_player, Error.TOO_LITTLE_CARDS_DROPPED)
+            return
         state.current_player.drop_cards(self.ids)
         yield None
