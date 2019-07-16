@@ -15,14 +15,14 @@ class BangCommand(Command):
     def execute(self, state):
         target = next(p for p in state.players if p.name == self.target)
         state.current_player.remove_card("bang")
-        target_response = yield Info(target, Info.BANG_OR_DODGE)
-        if isinstance(target_response, SkipCommand):
+        answer = yield Info(target, Info.BANG_OR_DODGE)
+        if isinstance(answer, SkipCommand):
             target.health = target.health - 1
             yield DamageReceived(target, 1)
-        elif isinstance(target_response, DodgeCommand):
+        elif isinstance(answer, DodgeCommand):
             target.remove_card("dodge")
             yield None
-        elif isinstance(target_response, BeerCommand) and target.health == 1:
+        elif isinstance(answer, BeerCommand) and target.health == 1:
             target.remove_card("beer")
             yield None
 

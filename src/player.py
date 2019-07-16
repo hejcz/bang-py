@@ -2,13 +2,12 @@ from typing import List
 
 
 class Player:
-    name: str
-    health: int = 4
-    used_bang: bool = False
-    cards: List[str] = []
 
     def __init__(self, name) -> None:
-        self.name = name
+        self.name: str = name
+        self.health: int = 4
+        self.used_bang: bool = False
+        self.cards: List[str] = []
 
     def add_cards(self, ids):
         self.cards = self.cards + ids

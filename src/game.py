@@ -1,13 +1,13 @@
 from src.channel import Channel
-from src.notifications import Info
+from src.notifications import Info, DamageReceived
 from src.player import Player
 from src.state import State
 
 
 class Game:
-    state = State([Player("tom"), Player("julian")])
 
     def __init__(self, channel: Channel):
+        self.state = State([Player("tom"), Player("julian")])
         self.channel = channel
 
     async def start(self):
@@ -44,7 +44,7 @@ class Game:
             while True:
                 command = yield self.send_and_receive(Info(self.state.current_player, Info.PLAY_CARD))
                 cmd_runner = command.execute(self.state)
-                step = cmd_runner.send(None)  # start it
+                step = cmd_runner.send(None)
                 if step is None:
                     break
                 while step is not None:
@@ -52,7 +52,7 @@ class Game:
                     step = cmd_runner.send(action)
                     if step is None:
                         break
-                    if step.get("type") == "finish":
+                    if isinstance(step, DamageReceived):
                         yield self.just_send(step)
                         break
 

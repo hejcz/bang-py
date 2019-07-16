@@ -1,11 +1,4 @@
-from typing import List
-
-from src.player import Player
-
-
 class State:
-    players: List[Player] = []
-    current_player: Player = None
 
     def __init__(self, players) -> None:
         self.players = players
