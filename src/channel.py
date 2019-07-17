@@ -1,7 +1,7 @@
 from typing import Dict
 import re
 
-from src.commands import Command, DodgeCommand, BeerCommand, BangCommand, DropCards, SkipCommand
+from src.commands import Command, DodgeCommand, BeerCommand, BangCommand, DropCardsCommand, SkipCommand
 from src.notifications import DamageReceived, Error, DropCards, PlayBangOrDodge, PlayCard
 
 
@@ -53,8 +53,8 @@ def drop_cards_adapter(command):
     if matches is None:
         return None
     try:
-        ids = map(lambda num: int(num), re.split(",", matches.group(1)))
-        return DropCards(ids)
+        ids = list(map(lambda num: int(num), re.split(",", matches.group(1))))
+        return DropCardsCommand(ids)
     except Exception:
         return None
 

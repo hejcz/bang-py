@@ -1,7 +1,7 @@
 import unittest
 
 from src.channel import Channel
-from src.commands import BangCommand, SkipCommand, BeerCommand, DropCards as DropCardsCommand
+from src.commands import BangCommand, SkipCommand, BeerCommand, DropCardsCommand as DropCardsCommand
 from src.game import Game
 from src.notifications import Error, DropCards, PlayBangOrDodge, PlayCard
 

@@ -61,14 +61,16 @@ class SkipCommand(Command):
         yield None
 
 
-class DropCards(Command):
+class DropCardsCommand(Command):
 
     def __init__(self, ids) -> None:
         self.ids = ids
 
-    def execute(self, state):
+    def validate(self, state):
         if len(state.current_player.cards) - len(self.ids) > state.current_player.health:
             yield Error(state.current_player, Error.TOO_LITTLE_CARDS_DROPPED)
-            return
+        return None
+
+    def execute(self, state):
         state.current_player.drop_cards(self.ids)
         yield None

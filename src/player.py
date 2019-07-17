@@ -26,7 +26,7 @@ class Player:
             raise NoSuchCardException(card_id)
 
     def drop_cards(self, ids):
-        self.cards = [card for j, card in enumerate(self.cards) if j not in ids]
+        self.cards = [card for j, card in enumerate(self.cards) if j + 1 not in ids]
 
     def heal_for(self, value):
         self.health = self.health + value
