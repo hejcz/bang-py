@@ -1,5 +1,6 @@
 from src.channel import Channel
-from src.notifications import Info, DamageReceived, Error
+from src.commands import SkipCommand
+from src.notifications import Error, PlayCard, DropCards
 from src.player import Player, NoSuchCardException
 from src.state import State
 
@@ -41,35 +42,40 @@ class Game:
             self.state.current_player.add_cards(["bang", "dodge"])
 
             # phase 2
-            while True:
-                command = yield self.send_and_receive(Info(self.state.current_player, Info.PLAY_CARD))
-                cmd_runner = command.execute(self.state)
-                try:
-                    step = cmd_runner.send(None)
-                except NoSuchCardException:
-                    yield self.just_send(Error(self.state.current_player, Error.CANT_PLAY_CARD_NOT_IN_HAND))
-                    continue
-                if step is None:
+            while len(self.state.current_player.cards) > 0:
+                # play card
+                command = yield self.send_and_receive(PlayCard(self.state.current_player))
+
+                if isinstance(command, SkipCommand):
                     break
-                if isinstance(step, Error):
-                    yield self.just_send(step)
+
+                validate = command.validate(self.state)
+                if validate is not None:
+                    yield self.just_send(validate)
                     continue
-                while step is not None:
-                    action = yield self.send_and_receive(step)
-                    step = cmd_runner.send(action)
+
+                cmd_runner = command.execute(self.state)
+                action = None
+                while True:
+                    try:
+                        step = cmd_runner.send(action)
+                    except NoSuchCardException:
+                        step = Error(self.state.current_player, Error.CANT_PLAY_CARD_NOT_IN_HAND)
                     if step is None:
                         break
-                    if isinstance(step, Error):
-                        yield self.just_send(step)
-                        continue
-                    if isinstance(step, DamageReceived):
+                    if step.ends_card_effect():
                         yield self.just_send(step)
                         break
+                    elif step.requires_response():
+                        action = yield self.send_and_receive(step)
+                    else:
+                        yield self.just_send(step)
 
             # phase 3
             if len(self.state.current_player.cards) > self.state.current_player.health:
-                drop_cards_command = yield self.send_and_receive(Info(self.state.current_player, Info.REMOVE_CARDS))
+                drop_cards_command = yield self.send_and_receive(DropCards(self.state.current_player))
                 step = drop_cards_command.execute(self.state).send(None)
                 if step is not None:
                     yield self.just_send(step)
+
             self.state.end_turn()

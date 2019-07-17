@@ -1,12 +1,43 @@
-class Info:
+class PlayCard:
 
-    PLAY_CARD = 0
-    BANG_OR_DODGE = 1
-    REMOVE_CARDS = 2
-
-    def __init__(self, player, msg) -> None:
+    def __init__(self, player) -> None:
         self.player = player
-        self.msg = msg
+
+    @staticmethod
+    def ends_card_effect():
+        return False
+
+    @staticmethod
+    def requires_response():
+        return True
+
+
+class PlayBangOrDodge:
+
+    def __init__(self, player) -> None:
+        self.player = player
+
+    @staticmethod
+    def ends_card_effect():
+        return False
+
+    @staticmethod
+    def requires_response():
+        return True
+
+
+class DropCards:
+
+    def __init__(self, player) -> None:
+        self.player = player
+
+    @staticmethod
+    def ends_card_effect():
+        return False
+
+    @staticmethod
+    def requires_response():
+        return True
 
 
 class DamageReceived:
@@ -14,6 +45,14 @@ class DamageReceived:
     def __init__(self, player, value) -> None:
         self.player = player
         self.value = value
+
+    @staticmethod
+    def ends_card_effect():
+        return True
+
+    @staticmethod
+    def requires_response():
+        return False
 
 
 class Error:
@@ -25,3 +64,11 @@ class Error:
     def __init__(self, player, error) -> None:
         self.player = player
         self.error = error
+
+    @staticmethod
+    def ends_card_effect():
+        return False
+
+    @staticmethod
+    def requires_response():
+        return True

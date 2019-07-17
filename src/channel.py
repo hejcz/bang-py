@@ -2,7 +2,7 @@ from typing import Dict
 import re
 
 from src.commands import Command, DodgeCommand, BeerCommand, BangCommand, DropCards, SkipCommand
-from src.notifications import Info, DamageReceived, Error
+from src.notifications import DamageReceived, Error, DropCards, PlayBangOrDodge, PlayCard
 
 
 class Channel:
@@ -67,12 +67,6 @@ class TerminalChannel(Channel):
         drop_cards_adapter
     ]
 
-    info_mappings = {
-        Info.PLAY_CARD: "Play card!",
-        Info.BANG_OR_DODGE: "You can play dodge or beer",
-        Info.REMOVE_CARDS: "Remove cards e.g. 1,2 to remove first and second cards"
-    }
-
     error_mappings = {
         Error.BANG_HIMSELF: "You can't play bang on yourself!",
         Error.TOO_LITTLE_CARDS_DROPPED: "Drop more cards. You can have at most number of cards equal to your health",
@@ -80,8 +74,12 @@ class TerminalChannel(Channel):
     }
 
     def send(self, notification):
-        if isinstance(notification, Info):
-            print("[{}]: {}".format(notification.player, self.info_mappings[notification.msg]))
+        if isinstance(notification, PlayCard):
+            print("[{}]: Play card!".format(notification.player))
+        if isinstance(notification, PlayBangOrDodge):
+            print("[{}]: Avoid bang!".format(notification.player))
+        if isinstance(notification, DropCards):
+            print("[{}]: Remove cards e.g. 1,2 to remove first and second cards!".format(notification.player))
         elif isinstance(notification, DamageReceived):
             print("[{}]: you received {} damage!".format(notification.player, notification.value))
         elif isinstance(notification, Error):

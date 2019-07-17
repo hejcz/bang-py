@@ -1,7 +1,10 @@
-from src.notifications import DamageReceived, Info, Error
+from src.notifications import DamageReceived, Error, PlayBangOrDodge
 
 
 class Command:
+
+    def validate(self, state):
+        return None
 
     def execute(self, state):
         pass
@@ -12,22 +15,29 @@ class BangCommand(Command):
     def __init__(self, target) -> None:
         self.target = target
 
-    def execute(self, state):
+    def validate(self, state):
         if state.current_player.name == self.target:
-            yield Error(state.current_player, Error.BANG_HIMSELF)
-            return
+            return Error(state.current_player, Error.BANG_HIMSELF)
+        return None
+
+    def execute(self, state):
         target = next(p for p in state.players if p.name == self.target)
         state.current_player.remove_card("bang")
-        answer = yield Info(target, Info.BANG_OR_DODGE)
-        if isinstance(answer, SkipCommand):
-            target.health = target.health - 1
-            yield DamageReceived(target, 1)
-        elif isinstance(answer, DodgeCommand):
-            target.remove_card("dodge")
-            yield None
-        elif isinstance(answer, BeerCommand) and target.health == 1:
-            target.remove_card("beer")
-            yield None
+        while True:
+            answer = yield PlayBangOrDodge(target)
+            if isinstance(answer, SkipCommand):
+                target.health = target.health - 1
+                yield DamageReceived(target, 1)
+                break
+            elif isinstance(answer, DodgeCommand):
+                target.remove_card("dodge")
+                break
+            elif isinstance(answer, BeerCommand) and target.health == 1:
+                target.remove_card("beer")
+                break
+            else:
+                pass
+        yield None
 
 
 class BeerCommand(Command):
