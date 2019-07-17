@@ -68,7 +68,7 @@ class DropCardsCommand(Command):
 
     def validate(self, state):
         if len(state.current_player.cards) - len(self.ids) > state.current_player.health:
-            yield Error(state.current_player, Error.TOO_LITTLE_CARDS_DROPPED)
+            return Error(state.current_player, Error.TOO_LITTLE_CARDS_DROPPED)
         return None
 
     def execute(self, state):

@@ -73,9 +73,14 @@ class Game:
 
             # phase 3
             if len(self.state.current_player.cards) > self.state.current_player.health:
-                drop_cards_command = yield self.send_and_receive(DropCards(self.state.current_player))
-                step = drop_cards_command.execute(self.state).send(None)
-                if step is not None:
-                    yield self.just_send(step)
+                while True:
+                    drop_cards_command = yield self.send_and_receive(DropCards(self.state.current_player))
+                    validate = drop_cards_command.validate(self.state)
+                    if validate is not None:
+                        continue
+                    step = drop_cards_command.execute(self.state).send(None)
+                    if step is not None:
+                        yield self.just_send(step)
+                    break
 
             self.state.end_turn()
