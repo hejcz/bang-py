@@ -61,13 +61,18 @@ class Game:
                         step = cmd_runner.send(action)
                     except NoSuchCardException:
                         step = Error(self.state.current_player, Error.CANT_PLAY_CARD_NOT_IN_HAND)
+                    # card does not require any more actions
+                    # TODO every card should emit end event instead of none. This if becomes useless then.
                     if step is None:
                         break
+                    # card emits event but does not require any more actions
                     if step.ends_card_effect():
                         yield self.just_send(step)
                         break
-                    elif step.requires_response():
+                    # card still has some effects to consider and requires some player to interact
+                    if step.requires_response():
                         action = yield self.send_and_receive(step)
+                    # card still has some effects to consider but it does not require interaction
                     else:
                         yield self.just_send(step)
 
@@ -77,6 +82,7 @@ class Game:
                     drop_cards_command = yield self.send_and_receive(DropCards(self.state.current_player))
                     validate = drop_cards_command.validate(self.state)
                     if validate is not None:
+                        yield self.just_send(validate)
                         continue
                     step = drop_cards_command.execute(self.state).send(None)
                     if step is not None:
