@@ -1,7 +1,8 @@
-from typing import Dict
 import re
+from typing import Dict
 
-from src.commands import Command, DodgeCommand, BeerCommand, BangCommand, DropCardsCommand, SkipCommand
+from src.commands import Command, DodgeCommand, BeerCommand, BangCommand, DropCardsCommand, SkipCommand, \
+    StagecoachCommand, WellsFargoCommand
 from src.notifications import DamageReceived, Error, DropCards, PlayBangOrDodge, PlayCard
 
 
@@ -46,6 +47,10 @@ def play_card_without_target_adapter(command):
         return BeerCommand()
     if card_name == "dodge":
         return DodgeCommand()
+    if card_name == "stagecoach":
+        return StagecoachCommand()
+    if card_name == "wells_fargo":
+        return WellsFargoCommand()
 
 
 def drop_cards_adapter(command):
@@ -70,7 +75,8 @@ class TerminalChannel(Channel):
     error_mappings = {
         Error.BANG_HIMSELF: "You can't play bang on yourself!",
         Error.TOO_LITTLE_CARDS_DROPPED: "Drop more cards. You can have at most number of cards equal to your health",
-        Error.CANT_PLAY_CARD_NOT_IN_HAND: "You can only play cards you have on your hand!"
+        Error.CANT_PLAY_CARD_NOT_IN_HAND: "You can only play cards you have on your hand!",
+        Error.CANT_PLAY_2BANGS_IN_1TURN: "You can only play one bang during your turn!"
     }
 
     def send(self, notification):

@@ -1,5 +1,5 @@
 from src.channel import Channel
-from src.commands import SkipCommand
+from src.commands import SkipCommand, DropCardsCommand
 from src.notifications import Error, PlayCard, DropCards
 from src.player import Player, NoSuchCardException
 from src.state import State
@@ -48,6 +48,9 @@ class Game:
 
                 if isinstance(command, SkipCommand):
                     break
+
+                if isinstance(command, DropCardsCommand):
+                    continue
 
                 validate = command.validate(self.state)
                 if validate is not None:
