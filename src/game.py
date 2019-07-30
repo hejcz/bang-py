@@ -49,9 +49,6 @@ class Game:
                 if isinstance(command, SkipCommand):
                     break
 
-                if isinstance(command, DropCardsCommand):
-                    continue
-
                 validate = command.validate(self.state)
                 if validate is not None:
                     yield self.just_send(validate)
@@ -60,10 +57,7 @@ class Game:
                 cmd_runner = command.execute(self.state)
                 action = None
                 while True:
-                    try:
-                        step = cmd_runner.send(action)
-                    except NoSuchCardException:
-                        step = Error(self.state.current_player, Error.CANT_PLAY_CARD_NOT_IN_HAND)
+                    step = cmd_runner.send(action)
                     # card does not require any more actions
                     # TODO every card should emit end event instead of none. This if becomes useless then.
                     if step is None:

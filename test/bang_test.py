@@ -1,9 +1,10 @@
 import unittest
 
 from src.channel import Channel
-from src.commands import BangCommand, SkipCommand, BeerCommand, DropCardsCommand as DropCardsCommand, PanicCommand
+from src.commands import BangCommand, SkipCommand, BeerCommand, DropCardsCommand as DropCardsCommand, PanicCommand, \
+    DuelCommand, KateCommand, DodgeCommand
 from src.game import Game
-from src.notifications import Error, DropCards, PlayBeerOrDodge, PlayCard
+from src.notifications import Error, DropCards, PlayBeerOrDodge, PlayCard, DamageReceivedAndEndTurn
 
 
 class TestChannel(Channel):
@@ -114,13 +115,33 @@ class TestSum(unittest.TestCase):
         step = running_game.send(PanicCommand("julian", 100))
         self.assert_error(step, Error.CANT_PICK_CARD_ON_GIVEN_INDEX)
 
+    def test_duel_with_error(self):
+        (game, running_game) = self.prepare_game(["bang", "bang", "duel", "duel", "bang", "duel"])
+        running_game.send(DuelCommand("julian"))
+        # julian plays bang event though he has only duel's on hand
+        error = running_game.send(BangCommand("tom"))
+        # he should be asked to repeat his move
+        step = running_game.send(SkipCommand())
+        # and it should not fail
+        self.assert_notification(step, DamageReceivedAndEndTurn, game.state.find_player("julian"))
+
+    def test_bang_with_error(self):
+        (game, running_game) = self.prepare_game(["bang", "bang", "bang", "bang", "bang", "dodge"])
+        running_game.send(BangCommand("julian"))
+        # julian plays dodge event though he has only bang's on hand
+        error = running_game.send(DodgeCommand())
+        # he should be asked to repeat his move
+        step = running_game.send(SkipCommand())
+        # and it should not fail
+        self.assert_notification(step, DamageReceivedAndEndTurn, game.state.find_player("julian"))
+
     def assert_error(self, step, error):
         self.assertIsInstance(step["content"], Error, "should be error")
         self.assertEqual(step["content"].error, error, "should have expected reason")
 
-    def assert_notification(self, step, cls, players):
+    def assert_notification(self, step, cls, player):
         self.assertIsInstance(step["content"], cls, "should be info")
-        self.assertEqual(step["content"].player, players, "should concern expected player")
+        self.assertEqual(step["content"].player, player, "should concern expected player")
 
 
 if __name__ == '__main__':

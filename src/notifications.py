@@ -40,7 +40,7 @@ class DropCards:
         return True
 
 
-class DamageReceived:
+class DamageReceivedAndEndTurn:
 
     def __init__(self, player, value) -> None:
         self.player = player
@@ -55,7 +55,7 @@ class DamageReceived:
         return False
 
 
-class GatlingDamageReceived:
+class DamageReceived:
 
     def __init__(self, player, value) -> None:
         self.player = player
@@ -81,6 +81,35 @@ class Error:
     def __init__(self, player, error) -> None:
         self.player = player
         self.error = error
+
+    @staticmethod
+    def ends_card_effect():
+        return False
+
+    @staticmethod
+    def requires_response():
+        return True
+
+
+class PlayBang:
+
+    def __init__(self, player) -> None:
+        self.player = player
+
+    @staticmethod
+    def ends_card_effect():
+        return False
+
+    @staticmethod
+    def requires_response():
+        return True
+
+
+class PickCard:
+
+    def __init__(self, player, cards) -> None:
+        self.player = player
+        self.cards = cards
 
     @staticmethod
     def ends_card_effect():

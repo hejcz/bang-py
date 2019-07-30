@@ -1,4 +1,4 @@
-# Etap 1
+# :white_check_mark: Etap 1
 
 Nie ma ról graczy - bandytów, szeryfa etc. Gracze mają tyle HP ile karty ich postaci (na początku 4). 
 Mogą dobierać karty, strzelać, unikać i leczyć się.
@@ -9,7 +9,7 @@ Mogą dobierać karty, strzelać, unikać i leczyć się.
 | 12          | pudło       | nic                   | -     |
 | 6           | piwko       | nic                   | -     |
 
-# Etap 2
+# :white_check_mark: Etap 2
 
 Gracze dostają więcej kart do swojego użytku.
 
@@ -25,7 +25,7 @@ Gracze dostają więcej kart do swojego użytku.
 Należy wprowadzić bandytów, szeryfa etc. Należy zdefiniować cele ich zwycięstwa i badać po każdym ruchu czy któryś
 z nich nie został spełniony.
 
-# Etap 4
+# :white_check_mark: Etap 4
 
 | Ile w talii | Nazwa     | Co musi zrobić gracz              | Uwagi |
 |-------------|-----------|-----------------------------------|-------|

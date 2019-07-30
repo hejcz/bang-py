@@ -1,3 +1,6 @@
+from src.player import Player
+
+
 class State:
 
     def __init__(self, players, cards) -> None:
@@ -17,5 +20,10 @@ class State:
         player.add_cards(self.cards[0:how_many])
         self.cards = self.cards[how_many:]
 
-    def find_player(self, name):
+    def find_player(self, name) -> Player:
         return next(p for p in self.players if p.name == name)
+
+    def pop_cards(self, how_many) -> Player:
+        cards = self.cards[0:how_many]
+        self.cards = self.cards[how_many:]
+        return cards

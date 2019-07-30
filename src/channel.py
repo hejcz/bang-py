@@ -2,8 +2,9 @@ import re
 from typing import Dict
 
 from src.commands import Command, DodgeCommand, BeerCommand, BangCommand, DropCardsCommand, SkipCommand, \
-    StagecoachCommand, WellsFargoCommand, PanicCommand, SaloonCommand, GatlingCommand
-from src.notifications import DamageReceived, Error, DropCards, PlayBeerOrDodge, PlayCard
+    StagecoachCommand, WellsFargoCommand, PanicCommand, SaloonCommand, GatlingCommand, IndiansCommand, ShopCommand, \
+    KateCommand, DuelCommand, PickCardCommand
+from src.notifications import DamageReceivedAndEndTurn, Error, DropCards, PlayBeerOrDodge, PlayCard, PlayBang, PickCard
 
 
 class Channel:
@@ -21,13 +22,22 @@ class Channel:
 
 
 def bang_adapter(command):
-    matches = re.search("^play bang on ([^ ]+)$", command)
+    matches = re.search("^play ([^ ]+) on ([^ ]+)$", command)
     if matches is None:
         return None
-    target = matches.group(1)
+    card = matches.group(1)
+    if card is None:
+        return None
+    target = matches.group(2)
     if target is None:
         return None
-    return BangCommand(target)
+    if card == "bang":
+        return BangCommand(target)
+    if card == "kate":
+        return KateCommand(target)
+    if card == "duel":
+        return DuelCommand(target)
+    return None
 
 
 def panic_adapter(command):
@@ -68,6 +78,11 @@ def play_card_without_target_adapter(command):
         return SaloonCommand()
     if card_name == "gatling":
         return GatlingCommand()
+    if card_name == "indians":
+        return IndiansCommand()
+    if card_name == "shop":
+        return ShopCommand()
+    return None
 
 
 def drop_cards_adapter(command):
@@ -81,13 +96,25 @@ def drop_cards_adapter(command):
         return None
 
 
+def pick_cards_adapter(command):
+    matches = re.search("^pick (\\d)$", command)
+    if matches is None:
+        return None
+    try:
+        ids = int(matches.group(1))
+        return PickCardCommand(ids)
+    except Exception:
+        return None
+
+
 class TerminalChannel(Channel):
     adapters = [
         bang_adapter,
         skip_adapter,
         play_card_without_target_adapter,
         drop_cards_adapter,
-        panic_adapter
+        panic_adapter,
+        pick_cards_adapter
     ]
 
     error_mappings = {
@@ -106,8 +133,12 @@ class TerminalChannel(Channel):
             print("[{}]: Avoid bang!".format(notification.player))
         if isinstance(notification, DropCards):
             print("[{}]: Remove cards e.g. 1,2 to remove first and second cards!".format(notification.player))
-        elif isinstance(notification, DamageReceived):
+        elif isinstance(notification, DamageReceivedAndEndTurn):
             print("[{}]: you received {} damage!".format(notification.player, notification.value))
+        elif isinstance(notification, PlayBang):
+            print("[{}]: play bang!".format(notification.player))
+        elif isinstance(notification, PickCard):
+            print("[{}]: pick card out of {} e.g. \"pick 1\"!".format(notification.player, notification.cards))
         elif isinstance(notification, Error):
             print("[ERROR][{}]: {}!".format(notification.player, self.error_mappings[notification.error]))
 
