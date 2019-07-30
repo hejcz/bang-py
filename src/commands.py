@@ -23,7 +23,7 @@ class BangCommand(Command):
         return None
 
     def execute(self, state):
-        target = next(p for p in state.players if p.name == self.target)
+        target = state.find_player(self.target)
         state.current_player.remove_card("bang")
         state.current_player.used_bang = True
         while True:
@@ -114,12 +114,12 @@ class PanicCommand(Command):
     def validate(self, state):
         if state.current_player.name == self.target:
             return Error(state.current_player, Error.PANIC_HIMSELF)
-        if self.card_index > len(next(p for p in state.players if p.name == self.target).cards):
+        if self.card_index > len(state.find_player(self.target).cards):
             return Error(state.current_player, Error.CANT_PICK_CARD_ON_GIVEN_INDEX)
         return None
 
     def execute(self, state):
-        target = next(p for p in state.players if p.name == self.target)
+        target = state.find_player(self.target)
         state.current_player.remove_card("panic")
         stolen_card = target.get_and_remove_card_on_index(self.card_index - 1)
         state.current_player.add_cards([stolen_card])

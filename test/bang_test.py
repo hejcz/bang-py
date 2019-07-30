@@ -1,7 +1,7 @@
 import unittest
 
 from src.channel import Channel
-from src.commands import BangCommand, SkipCommand, BeerCommand, DropCardsCommand as DropCardsCommand
+from src.commands import BangCommand, SkipCommand, BeerCommand, DropCardsCommand as DropCardsCommand, PanicCommand
 from src.game import Game
 from src.notifications import Error, DropCards, PlayBeerOrDodge, PlayCard
 
@@ -94,6 +94,25 @@ class TestSum(unittest.TestCase):
         running_game.send(None)  # swallow error
         step = running_game.send(BangCommand("julian"))
         self.assert_notification(step, PlayBeerOrDodge, game.state.players[1])
+
+    def test_panic(self):
+        """
+        Target should loose 1 card and current player should receive one card
+        """
+        (game, running_game) = self.prepare_game(["panic", "bang", "beer", "beer", "bang", "bang"])
+        running_game.send(PanicCommand("julian", 1))
+        self.assertEqual(1, len(game.state.find_player("julian").cards), "Julian lost 1 card")
+        self.assertEqual(4, len(game.state.find_player("tom").cards), "Tom received 1 card (he spent panic though)")
+
+    def test_panic_cant_be_played_on_self(self):
+        (game, running_game) = self.prepare_game(["panic", "bang", "beer", "beer", "bang", "bang"])
+        step = running_game.send(PanicCommand("tom", 1))
+        self.assert_error(step, Error.PANIC_HIMSELF)
+
+    def test_panic_player_cant_select_index_of_card_player_does_not_have_on_hand(self):
+        (game, running_game) = self.prepare_game(["panic", "bang", "beer", "beer", "bang", "bang"])
+        step = running_game.send(PanicCommand("julian", 100))
+        self.assert_error(step, Error.CANT_PICK_CARD_ON_GIVEN_INDEX)
 
     def assert_error(self, step, error):
         self.assertIsInstance(step["content"], Error, "should be error")

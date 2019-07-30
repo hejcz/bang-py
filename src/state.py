@@ -16,3 +16,6 @@ class State:
     def give_cards_to(self, player, how_many):
         player.add_cards(self.cards[0:how_many])
         self.cards = self.cards[how_many:]
+
+    def find_player(self, name):
+        return next(p for p in self.players if p.name == name)
