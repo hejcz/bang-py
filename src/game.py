@@ -36,10 +36,10 @@ class Game:
     def game_runner(self):
         self.state.end_turn()
         for player in self.state.players:
-            player.add_cards(["bang", "dodge"])
+            player.add_cards([])
         while not self.state.is_game_finished():
             # phase 1
-            self.state.current_player.add_cards(["bang", "dodge"])
+            self.state.current_player.add_cards(["panic"])
 
             # phase 2
             while len(self.state.current_player.cards) > 0:

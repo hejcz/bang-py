@@ -2,7 +2,7 @@ import re
 from typing import Dict
 
 from src.commands import Command, DodgeCommand, BeerCommand, BangCommand, DropCardsCommand, SkipCommand, \
-    StagecoachCommand, WellsFargoCommand
+    StagecoachCommand, WellsFargoCommand, PanicCommand, SaloonCommand, GatlingCommand
 from src.notifications import DamageReceived, Error, DropCards, PlayBangOrDodge, PlayCard
 
 
@@ -30,13 +30,29 @@ def bang_adapter(command):
     return BangCommand(target)
 
 
+def panic_adapter(command):
+    print("hello")
+    matches = re.search("^play panic on ([^ ]+) and pick (\\d+)$", command)
+    if matches is None:
+        return None
+    target = matches.group(1)
+    if target is None:
+        return None
+    card_index = matches.group(2)
+    if card_index is None:
+        return None
+    return PanicCommand(target, card_index)
+
+
 def skip_adapter(command):
+    print("hello")
     if command == "skip":
         return SkipCommand()
     return None
 
 
 def play_card_without_target_adapter(command):
+    print("hello")
     matches = re.search("^play ([^ ]+)$", command)
     if matches is None:
         return None
@@ -51,6 +67,10 @@ def play_card_without_target_adapter(command):
         return StagecoachCommand()
     if card_name == "wells_fargo":
         return WellsFargoCommand()
+    if card_name == "saloon":
+        return SaloonCommand()
+    if card_name == "gatling":
+        return GatlingCommand()
 
 
 def drop_cards_adapter(command):
@@ -69,14 +89,16 @@ class TerminalChannel(Channel):
         bang_adapter,
         skip_adapter,
         play_card_without_target_adapter,
-        drop_cards_adapter
+        drop_cards_adapter,
+        panic_adapter
     ]
 
     error_mappings = {
         Error.BANG_HIMSELF: "You can't play bang on yourself!",
         Error.TOO_LITTLE_CARDS_DROPPED: "Drop more cards. You can have at most number of cards equal to your health",
         Error.CANT_PLAY_CARD_NOT_IN_HAND: "You can only play cards you have on your hand!",
-        Error.CANT_PLAY_2BANGS_IN_1TURN: "You can only play one bang during your turn!"
+        Error.CANT_PLAY_2BANGS_IN_1TURN: "You can only play one bang during your turn!",
+        Error.PANIC_HIMSELF: "You can't play panic on yourself!"
     }
 
     def send(self, notification):
@@ -103,7 +125,7 @@ class TerminalChannel(Channel):
         while True:
             player_input = input().strip()
             try:
-                command = next(match(player_input) for match in self.adapters if match(player_input) is not None)
+                command = next(cmd for cmd in (match(player_input) for match in self.adapters) if cmd is not None)
                 break
             except StopIteration:
                 print("That was not a valid command. Try again!")

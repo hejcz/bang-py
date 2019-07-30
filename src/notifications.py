@@ -61,6 +61,7 @@ class Error:
     TOO_LITTLE_CARDS_DROPPED = 1
     CANT_PLAY_CARD_NOT_IN_HAND = 2
     CANT_PLAY_2BANGS_IN_1TURN = 3
+    PANIC_HIMSELF = 4
 
     def __init__(self, player, error) -> None:
         self.player = player
