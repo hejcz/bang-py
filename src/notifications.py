@@ -12,7 +12,7 @@ class PlayCard:
         return True
 
 
-class PlayBangOrDodge:
+class PlayBeerOrDodge:
 
     def __init__(self, player) -> None:
         self.player = player
@@ -55,13 +55,28 @@ class DamageReceived:
         return False
 
 
-class Error:
+class GatlingDamageReceived:
 
+    def __init__(self, player, value) -> None:
+        self.player = player
+        self.value = value
+
+    @staticmethod
+    def ends_card_effect():
+        return False
+
+    @staticmethod
+    def requires_response():
+        return False
+
+
+class Error:
     BANG_HIMSELF = 0
     TOO_LITTLE_CARDS_DROPPED = 1
     CANT_PLAY_CARD_NOT_IN_HAND = 2
     CANT_PLAY_2BANGS_IN_1TURN = 3
     PANIC_HIMSELF = 4
+    CANT_PICK_CARD_ON_GIVEN_INDEX = 5
 
     def __init__(self, player, error) -> None:
         self.player = player

@@ -1,14 +1,14 @@
 from src.channel import Channel
 from src.commands import SkipCommand, DropCardsCommand
 from src.notifications import Error, PlayCard, DropCards
-from src.player import Player, NoSuchCardException
+from src.player import NoSuchCardException, Player
 from src.state import State
 
 
 class Game:
 
-    def __init__(self, channel: Channel):
-        self.state = State([Player("tom"), Player("julian")])
+    def __init__(self, channel: Channel, players, cards):
+        self.state = State([Player(name) for name in players], cards)
         self.channel = channel
 
     async def start(self):
@@ -36,10 +36,10 @@ class Game:
     def game_runner(self):
         self.state.end_turn()
         for player in self.state.players:
-            player.add_cards([])
+            self.state.give_cards_to(player, 2)
         while not self.state.is_game_finished():
             # phase 1
-            self.state.current_player.add_cards(["panic"])
+            self.state.give_cards_to(self.state.current_player, 2)
 
             # phase 2
             while len(self.state.current_player.cards) > 0:

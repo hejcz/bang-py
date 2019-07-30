@@ -3,7 +3,7 @@ from typing import Dict
 
 from src.commands import Command, DodgeCommand, BeerCommand, BangCommand, DropCardsCommand, SkipCommand, \
     StagecoachCommand, WellsFargoCommand, PanicCommand, SaloonCommand, GatlingCommand
-from src.notifications import DamageReceived, Error, DropCards, PlayBangOrDodge, PlayCard
+from src.notifications import DamageReceived, Error, DropCards, PlayBeerOrDodge, PlayCard
 
 
 class Channel:
@@ -31,7 +31,6 @@ def bang_adapter(command):
 
 
 def panic_adapter(command):
-    print("hello")
     matches = re.search("^play panic on ([^ ]+) and pick (\\d+)$", command)
     if matches is None:
         return None
@@ -41,18 +40,16 @@ def panic_adapter(command):
     card_index = matches.group(2)
     if card_index is None:
         return None
-    return PanicCommand(target, card_index)
+    return PanicCommand(target, int(card_index))
 
 
 def skip_adapter(command):
-    print("hello")
     if command == "skip":
         return SkipCommand()
     return None
 
 
 def play_card_without_target_adapter(command):
-    print("hello")
     matches = re.search("^play ([^ ]+)$", command)
     if matches is None:
         return None
@@ -98,13 +95,14 @@ class TerminalChannel(Channel):
         Error.TOO_LITTLE_CARDS_DROPPED: "Drop more cards. You can have at most number of cards equal to your health",
         Error.CANT_PLAY_CARD_NOT_IN_HAND: "You can only play cards you have on your hand!",
         Error.CANT_PLAY_2BANGS_IN_1TURN: "You can only play one bang during your turn!",
-        Error.PANIC_HIMSELF: "You can't play panic on yourself!"
+        Error.PANIC_HIMSELF: "You can't play panic on yourself!",
+        Error.CANT_PICK_CARD_ON_GIVEN_INDEX: "You can't get chosen card because player does not have it!"
     }
 
     def send(self, notification):
         if isinstance(notification, PlayCard):
             print("[{}]: Play card!".format(notification.player))
-        if isinstance(notification, PlayBangOrDodge):
+        if isinstance(notification, PlayBeerOrDodge):
             print("[{}]: Avoid bang!".format(notification.player))
         if isinstance(notification, DropCards):
             print("[{}]: Remove cards e.g. 1,2 to remove first and second cards!".format(notification.player))

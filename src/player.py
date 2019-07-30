@@ -25,6 +25,9 @@ class Player:
         except ValueError:
             raise NoSuchCardException(card_id)
 
+    def get_and_remove_card_on_index(self, card_index):
+        return self.cards.pop(card_index)
+
     def drop_cards(self, ids):
         self.cards = [card for j, card in enumerate(self.cards) if j + 1 not in ids]
 

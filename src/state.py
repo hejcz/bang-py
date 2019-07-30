@@ -1,7 +1,8 @@
 class State:
 
-    def __init__(self, players) -> None:
+    def __init__(self, players, cards) -> None:
         self.players = players
+        self.cards = cards
         self.current_player = players[-1]
 
     def end_turn(self):
@@ -11,3 +12,7 @@ class State:
 
     def is_game_finished(self):
         return len([p for p in self.players if p.health > 0]) == 1
+
+    def give_cards_to(self, player, how_many):
+        player.add_cards(self.cards[0:how_many])
+        self.cards = self.cards[how_many:]

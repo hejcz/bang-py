@@ -3,7 +3,7 @@ import unittest
 from src.channel import Channel
 from src.commands import BangCommand, SkipCommand, BeerCommand, DropCardsCommand as DropCardsCommand
 from src.game import Game
-from src.notifications import Error, DropCards, PlayBangOrDodge, PlayCard
+from src.notifications import Error, DropCards, PlayBeerOrDodge, PlayCard
 
 
 class TestChannel(Channel):
@@ -15,20 +15,26 @@ class TestChannel(Channel):
 class TestSum(unittest.TestCase):
 
     @staticmethod
-    def prepare_game():
-        game = Game(TestChannel())
+    def six_bangs():
+        return ["bang", "bang", "bang", "bang", "bang", "bang"]
+
+    @staticmethod
+    def prepare_game(cards, players=None):
+        if players is None:
+            players = ["tom", "julian"]
+        game = Game(TestChannel(), players, cards)
         running_game = game.game_runner()
         running_game.send(None)
         return game, running_game
 
     def test_player_cant_bang_himself(self):
-        (game, running_game) = self.prepare_game()
+        (game, running_game) = self.prepare_game(self.six_bangs())
         self.assertEqual(game.state.current_player.health, 4, "should be equal to initial value")
         step = running_game.send(BangCommand("tom"))
         self.assert_error(step, Error.BANG_HIMSELF)
 
     def test_cant_play_card_that_he_has_not_in_hand(self):
-        (game, running_game) = self.prepare_game()
+        (game, running_game) = self.prepare_game(self.six_bangs())
         step = running_game.send(BeerCommand())
         self.assert_error(step, Error.CANT_PLAY_CARD_NOT_IN_HAND)
 
@@ -36,7 +42,7 @@ class TestSum(unittest.TestCase):
         """
         If player has 1 health and 4 cards then he must drop cards.
         """
-        (game, running_game) = self.prepare_game()
+        (game, running_game) = self.prepare_game(self.six_bangs())
         game.state.current_player.health = 3
         step = running_game.send(SkipCommand())
         self.assert_notification(step, DropCards, game.state.players[0])
@@ -45,7 +51,7 @@ class TestSum(unittest.TestCase):
         """
         If player has 1 health and 4 cards then he must drop cards.
         """
-        (game, running_game) = self.prepare_game()
+        (game, running_game) = self.prepare_game(self.six_bangs())
         game.state.current_player.health = 1
         running_game.send(SkipCommand())
         step = running_game.send(DropCardsCommand([1]))
@@ -55,7 +61,7 @@ class TestSum(unittest.TestCase):
         """
         If player has 1 health and 4 cards then he must drop cards.
         """
-        (game, running_game) = self.prepare_game()
+        (game, running_game) = self.prepare_game(self.six_bangs())
         game.state.current_player.health = 1
         running_game.send(SkipCommand())
         step = running_game.send(DropCardsCommand([1, 2, 3]))
@@ -65,7 +71,7 @@ class TestSum(unittest.TestCase):
         """
         If player has 1 health and 4 cards then he must drop cards.
         """
-        (game, running_game) = self.prepare_game()
+        (game, running_game) = self.prepare_game(self.six_bangs())
         game.state.current_player.health = 4
         step = running_game.send(SkipCommand())
         self.assert_notification(step, PlayCard, game.state.players[1])
@@ -74,7 +80,7 @@ class TestSum(unittest.TestCase):
         """
         Player should not be asked to drop cards if he has less card on hand than hp.
         """
-        (game, running_game) = self.prepare_game()
+        (game, running_game) = self.prepare_game(self.six_bangs())
         step = running_game.send(SkipCommand())
         self.assert_notification(step, PlayCard, game.state.players[1])
 
@@ -82,12 +88,12 @@ class TestSum(unittest.TestCase):
         """
         Player should not be asked to drop cards if he has less card on hand than hp.
         """
-        (game, running_game) = self.prepare_game()
+        (game, running_game) = self.prepare_game(self.six_bangs())
         running_game.send(BangCommand("tom"))
         # player should repeat his invalid move
         running_game.send(None)  # swallow error
         step = running_game.send(BangCommand("julian"))
-        self.assert_notification(step, PlayBangOrDodge, game.state.players[1])
+        self.assert_notification(step, PlayBeerOrDodge, game.state.players[1])
 
     def assert_error(self, step, error):
         self.assertIsInstance(step["content"], Error, "should be error")
