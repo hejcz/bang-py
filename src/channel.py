@@ -1,9 +1,19 @@
 import re
 from typing import Dict
 
-from src.commands import Command, DodgeCommand, BeerCommand, BangCommand, DropCardsCommand, SkipCommand, \
-    StagecoachCommand, WellsFargoCommand, PanicCommand, SaloonCommand, GatlingCommand, IndiansCommand, ShopCommand, \
-    KateCommand, DuelCommand, PickCardCommand
+from src.card.bang import BangCommand
+from src.card.beer import BeerCommand
+from src.card.dodge import DodgeCommand
+from src.card.duel import DuelCommand
+from src.card.gatling import GatlingCommand
+from src.card.indians import IndiansCommand
+from src.card.kate import KateCommand
+from src.card.panic import PanicCommand
+from src.card.saloon import SaloonCommand
+from src.card.shop import ShopCommand
+from src.card.stagecoach import StagecoachCommand
+from src.card.wells_fargo import WellsFargoCommand
+from src.commands import Command, DropCardsCommand, SkipCommand, PickCardCommand
 from src.notifications import DamageReceivedAndEndTurn, Error, DropCards, PlayBeerOrDodge, PlayCard, PlayBang, PickCard
 
 

@@ -11,10 +11,14 @@ cards = [
     ["shop"] * 2,
     ["kate"] * 4,
     ["duel"] * 3,
-    ["beer"] * 6,
-    ["panic"] * 4,
-    ["dodge"] * 11,
-    ["saloon", "gatling", "wells_fargo"]
+    ["saloon", "gatling", "wells_fargo"],
+    # TODO
+    ["prison"] * 3,
+    ["barell"] * 2,
+    ["horse"] * 2,
+    ["shofield"] * 3,
+    ["volcanic"] * 2,
+    ["dynamite", "winchester", "remington", "rev_carabine", "field_glass"]
 ]
 
 deck = [item for sublist in cards for item in sublist]

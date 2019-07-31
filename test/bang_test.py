@@ -1,8 +1,12 @@
 import unittest
 
+from src.card.bang import BangCommand
+from src.card.beer import BeerCommand
+from src.card.dodge import DodgeCommand
+from src.card.duel import DuelCommand
+from src.card.panic import PanicCommand
 from src.channel import Channel
-from src.commands import BangCommand, SkipCommand, BeerCommand, DropCardsCommand as DropCardsCommand, PanicCommand, \
-    DuelCommand, KateCommand, DodgeCommand
+from src.commands import SkipCommand, DropCardsCommand as DropCardsCommand
 from src.game import Game
 from src.notifications import Error, DropCards, PlayBeerOrDodge, PlayCard, DamageReceivedAndEndTurn
 
