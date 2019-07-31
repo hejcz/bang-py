@@ -1,4 +1,5 @@
 from src.commands import Command, safe_remove_card, no_such_card
+from src.notifications import NoEffect
 
 
 class SaloonCommand(Command):
@@ -8,4 +9,4 @@ class SaloonCommand(Command):
             yield no_such_card(state.current_player)
         for player in state.players:
             player.heal_for(1)
-        yield None
+        yield NoEffect()

@@ -1,5 +1,5 @@
 from src.commands import Command, safe_remove_card, no_such_card
-from src.notifications import Error
+from src.notifications import Error, NoEffect
 
 
 class PanicCommand(Command):
@@ -21,4 +21,4 @@ class PanicCommand(Command):
         target = state.find_player(self.target)
         stolen_card = target.get_and_remove_card_on_index(self.card_index - 1)
         state.current_player.add_cards([stolen_card])
-        yield None
+        yield NoEffect()

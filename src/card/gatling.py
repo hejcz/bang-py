@@ -1,7 +1,7 @@
 from src.card.beer import BeerCommand
 from src.card.dodge import DodgeCommand
 from src.commands import Command, safe_remove_card, no_such_card, SkipCommand
-from src.notifications import PlayBeerOrDodge, DamageReceived
+from src.notifications import PlayBeerOrDodge, DamageReceived, NoEffect
 
 
 class GatlingCommand(Command):
@@ -24,4 +24,4 @@ class GatlingCommand(Command):
                     if not safe_remove_card(state.current_player, "beer"):
                         continue
                     break
-        yield None
+        yield NoEffect()

@@ -1,5 +1,5 @@
 from src.commands import Command, safe_remove_card, no_such_card, DropCardsCommand
-from src.notifications import DropCards
+from src.notifications import DropCards, NoEffect
 
 
 class KateCommand(Command):
@@ -17,5 +17,4 @@ class KateCommand(Command):
                 if len(answer.cards_to_remove) != 1:
                     continue
                 target_player.drop_cards(answer.cards_to_remove)
-                break
-        yield None
+                yield NoEffect()

@@ -1,6 +1,6 @@
 from src.card.bang import BangCommand
 from src.commands import Command, safe_remove_card, no_such_card, SkipCommand
-from src.notifications import PlayBang, DamageReceived
+from src.notifications import PlayBang, DamageReceived, NoEffect
 
 
 class IndiansCommand(Command):
@@ -19,4 +19,4 @@ class IndiansCommand(Command):
                     if not safe_remove_card(state.current_player, "bang"):
                         continue
                     break
-        yield None
+        yield NoEffect()

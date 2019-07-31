@@ -1,5 +1,5 @@
 from src.commands import Command, safe_remove_card, no_such_card, PickCardCommand
-from src.notifications import PickCard
+from src.notifications import PickCard, NoEffect
 
 
 class ShopCommand(Command):
@@ -19,4 +19,4 @@ class ShopCommand(Command):
                     target.add_cards([cards_in_shop[answer.index_to_pick - 1]])
                     cards_in_shop.pop(answer.index_to_pick - 1)
                     break
-        yield None
+        yield NoEffect()

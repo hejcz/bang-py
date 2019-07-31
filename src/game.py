@@ -46,9 +46,11 @@ class Game:
                 # play card
                 command = yield self.send_and_receive(PlayCard(self.state.current_player))
 
+                # end turn
                 if isinstance(command, SkipCommand):
                     break
 
+                # check if command is valid
                 validate = command.validate(self.state)
                 if validate is not None:
                     yield self.just_send(validate)
@@ -58,13 +60,10 @@ class Game:
                 action = None
                 while True:
                     step = cmd_runner.send(action)
-                    # card does not require any more actions
-                    # TODO every card should emit end event instead of none. This if becomes useless then.
-                    if step is None:
-                        break
-                    # card emits event but does not require any more actions
+                    # all card effects have been applied
                     if step.ends_card_effect():
-                        yield self.just_send(step)
+                        if step.has_something_to_send():
+                            yield self.just_send(step)
                         break
                     # card still has some effects to consider and requires some player to interact
                     if step.requires_response():
@@ -81,9 +80,7 @@ class Game:
                     if validate is not None:
                         yield self.just_send(validate)
                         continue
-                    step = drop_cards_command.execute(self.state).send(None)
-                    if step is not None:
-                        yield self.just_send(step)
+                    drop_cards_command.execute(self.state).send(None)
                     break
 
             self.state.end_turn()

@@ -1,7 +1,7 @@
 from src.card.beer import BeerCommand
 from src.card.dodge import DodgeCommand
 from src.commands import Command, safe_remove_card, no_such_card, SkipCommand
-from src.notifications import Error, PlayBeerOrDodge, DamageReceivedAndEndTurn
+from src.notifications import Error, PlayBeerOrDodge, DamageReceivedAndEndTurn, NoEffect
 
 
 class BangCommand(Command):
@@ -26,13 +26,11 @@ class BangCommand(Command):
             if isinstance(answer, SkipCommand):
                 target.health = target.health - 1
                 yield DamageReceivedAndEndTurn(target, 1)
-                return
             elif isinstance(answer, DodgeCommand):
                 if not safe_remove_card(target, "dodge"):
                     continue
-                break
+                yield NoEffect()
             elif isinstance(answer, BeerCommand) and target.health == 1:
                 if not safe_remove_card(target, "beer"):
                     continue
-                break
-        yield None
+                yield NoEffect()

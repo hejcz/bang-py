@@ -1,4 +1,4 @@
-from src.notifications import Error
+from src.notifications import Error, NoEffect
 from src.player import Player, NoSuchCardException
 
 
@@ -26,7 +26,7 @@ class Command:
 class SkipCommand(Command):
 
     def execute(self, state):
-        yield None
+        yield NoEffect()
 
 
 class DropCardsCommand(Command):
@@ -41,7 +41,7 @@ class DropCardsCommand(Command):
 
     def execute(self, state):
         state.current_player.drop_cards(self.cards_to_remove)
-        yield None
+        yield NoEffect()
 
 
 class PickCardCommand(Command):
@@ -50,4 +50,4 @@ class PickCardCommand(Command):
         self.index_to_pick = index_to_pick
 
     def execute(self, state):
-        yield None
+        yield NoEffect()

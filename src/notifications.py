@@ -1,4 +1,18 @@
-class PlayCard:
+class SendsSomethingMixin:
+
+    @staticmethod
+    def has_something_to_send():
+        return True
+
+
+class RequiresResponseMixin:
+
+    @staticmethod
+    def requires_response():
+        return True
+
+
+class PlayCard(SendsSomethingMixin, RequiresResponseMixin):
 
     def __init__(self, player) -> None:
         self.player = player
@@ -7,12 +21,8 @@ class PlayCard:
     def ends_card_effect():
         return False
 
-    @staticmethod
-    def requires_response():
-        return True
 
-
-class PlayBeerOrDodge:
+class PlayBeerOrDodge(SendsSomethingMixin, RequiresResponseMixin):
 
     def __init__(self, player) -> None:
         self.player = player
@@ -21,12 +31,8 @@ class PlayBeerOrDodge:
     def ends_card_effect():
         return False
 
-    @staticmethod
-    def requires_response():
-        return True
 
-
-class DropCards:
+class DropCards(SendsSomethingMixin, RequiresResponseMixin):
 
     def __init__(self, player) -> None:
         self.player = player
@@ -35,12 +41,8 @@ class DropCards:
     def ends_card_effect():
         return False
 
-    @staticmethod
-    def requires_response():
-        return True
 
-
-class DamageReceivedAndEndTurn:
+class DamageReceivedAndEndTurn(SendsSomethingMixin):
 
     def __init__(self, player, value) -> None:
         self.player = player
@@ -55,7 +57,7 @@ class DamageReceivedAndEndTurn:
         return False
 
 
-class DamageReceived:
+class DamageReceived(SendsSomethingMixin):
 
     def __init__(self, player, value) -> None:
         self.player = player
@@ -70,7 +72,7 @@ class DamageReceived:
         return False
 
 
-class Error:
+class Error(SendsSomethingMixin, RequiresResponseMixin):
     BANG_HIMSELF = 0
     TOO_LITTLE_CARDS_DROPPED = 1
     CANT_PLAY_CARD_NOT_IN_HAND = 2
@@ -86,12 +88,8 @@ class Error:
     def ends_card_effect():
         return False
 
-    @staticmethod
-    def requires_response():
-        return True
 
-
-class PlayBang:
+class PlayBang(SendsSomethingMixin, RequiresResponseMixin):
 
     def __init__(self, player) -> None:
         self.player = player
@@ -100,12 +98,8 @@ class PlayBang:
     def ends_card_effect():
         return False
 
-    @staticmethod
-    def requires_response():
-        return True
 
-
-class PickCard:
+class PickCard(SendsSomethingMixin, RequiresResponseMixin):
 
     def __init__(self, player, cards) -> None:
         self.player = player
@@ -115,6 +109,17 @@ class PickCard:
     def ends_card_effect():
         return False
 
+
+class NoEffect:
+
+    @staticmethod
+    def ends_card_effect():
+        return True
+
     @staticmethod
     def requires_response():
-        return True
+        return False
+
+    @staticmethod
+    def has_something_to_send():
+        return False
